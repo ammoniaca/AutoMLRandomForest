@@ -21,35 +21,27 @@ if __name__ == '__main__':
 
     # AutoML - RF: example for GridSearchCV
 
-    space = {
-        'bootstrap': [True, False],
-        'max_depth': [10, 20, 30],
-        'max_features': ['log2', 'sqrt'],
-        'min_samples_leaf': [1, 2, 4],
-        'min_samples_split': [2, 5, 10],
-        'n_estimators': [130, 180, 230]
-    },
-
     request = RequestDTO(
         task=EstimatorTask.REGRESSION,
         space={
-            'bootstrap': [True],
-            'max_depth': [10],
+            'bootstrap': [True, False],
+            'max_depth': [10, 20],
             'max_features': ['sqrt'],
-            'min_samples_leaf': [1],
-            'min_samples_split': [2],
-            'n_estimators': [130]
+            'min_samples_leaf': [1, 2],
+            'min_samples_split': [2, 10],
+            'n_estimators': [130, 250]
         },
         X_train=X_train,
         y_train=y_train,
         X_test=X_test,
         y_test=y_test,
         optimizer=HyperparameterOptimizer.GRID_SEARCH_CV,
-        cv=5,  # if you wish LOO then cv=len(X_test)
+        cv=5,  # if you wish LOO then cv=len(X_train) or cv=len(y_train)
         verbose=2,
         tuning_scoring=RegressionScore.NEG_ROOT_MEAN_SQUARED_ERROR,
         validation_scoring=[RegressionScore.R2, RegressionScore.MAX_ERROR, RegressionScore.NEG_ROOT_MEAN_SQUARED_ERROR]
     )
 
-    xx = GridSearchCVStrategy(request=request).optimize()
-    print("")
+    grid_search_result = GridSearchCVStrategy(request=request).optimize()
+
+    # AutoML - RF: example for RandomizedSearchCV

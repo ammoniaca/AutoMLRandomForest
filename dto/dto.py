@@ -19,9 +19,10 @@ class RequestDTO:
     y_test: ArrayLike
     cv: int
     optimizer: HyperparameterOptimizer
-    verbose: int
+
     tuning_scoring: ClassificationScore | RegressionScore
     validation_scoring: list[ClassificationScore] | list[RegressionScore]
+    verbose: int
 
     def __post_init__(self):
 
