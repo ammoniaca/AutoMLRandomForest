@@ -1,10 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from numpy.typing import ArrayLike
 
 from enumerator.scores import ClassificationScore, RegressionScore
 from enumerator.estimator_task import EstimatorTask
 from enumerator.hyperparameter_optimizers import HyperparameterOptimizer
+
+
+@dataclass
+class DataAnalysisDTO:
+    X_train: ArrayLike
+    X_test: ArrayLike
+    y_train: ArrayLike
+    y_test: ArrayLike
 
 
 @dataclass
@@ -17,14 +25,19 @@ class RequestDTO:
     y_train: ArrayLike
     X_test: ArrayLike
     y_test: ArrayLike
-    cv: int
     optimizer: HyperparameterOptimizer
-
     tuning_scoring: ClassificationScore | RegressionScore
     validation_scoring: list[ClassificationScore] | list[RegressionScore]
-    verbose: int
+    cv: int = field(repr=False, default=5)
+    verbose: int = field(repr=False, default=0)
+    n_iter: int = field(repr=False, default=10)
+    n_jobs: int = field(repr=False, default=1)
+    seed: int = field(repr=False, default=None)
 
     def __post_init__(self):
+
+        if self.verbose < 0:
+            raise ValueError(f"verbose {self.verbose} is not supported. Supported values are >= 0")
 
         # TODO: check tuning_scoring: [ClassificationScore] | [RegressionScore]
 
@@ -59,7 +72,7 @@ class RequestDTO:
 
 
 @dataclass
-class ResponseTuningDTO:
+class _ResponseTuningDTO:
     """
     """
     best_estimator: RandomForestClassifier | RandomForestRegressor
