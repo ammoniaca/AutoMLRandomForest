@@ -1,10 +1,10 @@
-from dto.dto import RequestDTO, _ResponseTuningDTO
+from dto.dto import RequestDTO, ResponseTuningDTO
 from sklearn.metrics import get_scorer
 
 
 class ModelValidator:
 
-    def __init__(self, request: RequestDTO, response: _ResponseTuningDTO):
+    def __init__(self, request: RequestDTO, response: ResponseTuningDTO):
         self._request = request
         self._response = response
         self._y_pred = self._response.best_estimator.predict(self._request.X_test)

@@ -72,7 +72,7 @@ class RequestDTO:
 
 
 @dataclass
-class _ResponseTuningDTO:
+class ResponseTuningDTO:
     """
     """
     best_estimator: RandomForestClassifier | RandomForestRegressor

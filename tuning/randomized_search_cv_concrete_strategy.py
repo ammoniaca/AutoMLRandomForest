@@ -1,6 +1,6 @@
 from sklearn.model_selection import RandomizedSearchCV
 
-from dto.dto import RequestDTO, _ResponseTuningDTO
+from dto.dto import RequestDTO, ResponseTuningDTO
 from tuning.estimator_type import get_estimator
 from tuning.optimizer_strategy import IOptimizerStrategy
 
@@ -10,7 +10,7 @@ class RandomizedSearchCVStrategy(IOptimizerStrategy):
     def __init__(self, request: RequestDTO):
         self._request = request
 
-    def optimize(self) -> _ResponseTuningDTO:
+    def optimize(self) -> ResponseTuningDTO:
         randomized_search = RandomizedSearchCV(
             estimator=get_estimator(self._request),
             param_distributions=self._request.space,
@@ -24,7 +24,7 @@ class RandomizedSearchCVStrategy(IOptimizerStrategy):
 
         )
         randomized_search.fit(self._request.X_train, self._request.y_train)
-        return _ResponseTuningDTO(
+        return ResponseTuningDTO(
             best_estimator=randomized_search.best_estimator_,
             best_params=randomized_search.best_params_,
             best_score=randomized_search.best_score_

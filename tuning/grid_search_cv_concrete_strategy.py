@@ -2,7 +2,7 @@ from sklearn.model_selection import GridSearchCV
 
 from tuning.estimator_type import get_estimator
 from tuning.optimizer_strategy import IOptimizerStrategy
-from dto.dto import RequestDTO, _ResponseTuningDTO
+from dto.dto import RequestDTO, ResponseTuningDTO
 
 
 class GridSearchCVStrategy(IOptimizerStrategy):
@@ -10,7 +10,7 @@ class GridSearchCVStrategy(IOptimizerStrategy):
     def __init__(self, request: RequestDTO):
         self._request = request
 
-    def optimize(self) -> _ResponseTuningDTO:
+    def optimize(self) -> ResponseTuningDTO:
         """
          hyperparameter tuning by exhaustively searching through a predefined grid of
          parameter combinations, evaluating each combination using cross-validation,
@@ -27,7 +27,7 @@ class GridSearchCVStrategy(IOptimizerStrategy):
             pre_dispatch=self._request.n_jobs
         )
         grid_search.fit(self._request.X_train, self._request.y_train)
-        return _ResponseTuningDTO(
+        return ResponseTuningDTO(
             best_estimator=grid_search.best_estimator_,
             best_params=grid_search.best_params_,
             best_score=grid_search.best_score_
