@@ -1,7 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from numpy.typing import ArrayLike
+from typing import Union
 
+from dto.space_rf_dto import SpaceRandomForest
 from enumerator.scores import ClassificationScore, RegressionScore
 from enumerator.estimator_task import EstimatorTask
 from enumerator.hyperparameter_optimizers import HyperparameterOptimizer
@@ -20,7 +22,6 @@ class RequestDTO:
     """
     """
     task: EstimatorTask
-    space: dict
     X_train: ArrayLike
     y_train: ArrayLike
     X_test: ArrayLike
@@ -28,6 +29,7 @@ class RequestDTO:
     optimizer: HyperparameterOptimizer
     tuning_scoring: ClassificationScore | RegressionScore
     validation_scoring: list[ClassificationScore] | list[RegressionScore]
+    space: SpaceRandomForest = field(repr=False, default=None)
     cv: int = field(repr=False, default=5)
     verbose: int = field(repr=False, default=0)
     n_iter: int = field(repr=False, default=10)
@@ -68,6 +70,9 @@ class RequestDTO:
         if not 1 <= self.cv < len(self.X_train):
             raise ValueError("the value of cv must be between 1 and the maximum number of training elements")
 
+    def space_to_dict(self):
+        # convert space object in a dictionary removing None value
+        return {k: v for k, v in asdict(self.space).items() if v is not None}
 
 
 
@@ -75,6 +80,12 @@ class RequestDTO:
 class ResponseTuningDTO:
     """
     """
-    best_estimator: RandomForestClassifier | RandomForestRegressor
+    strategy: str
+    best_estimator: Union[
+        RandomForestClassifier,
+        RandomForestRegressor,
+        RandomForestClassifier(),
+        RandomForestRegressor()
+    ]
     best_params: dict
-    best_score: float
+    tuning_metric: dict

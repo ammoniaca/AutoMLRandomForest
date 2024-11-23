@@ -1,9 +1,8 @@
-from dataclasses import dataclass, asdict
+from dataclasses import asdict
 
 from dto.dto import RequestDTO, ResponseTuningDTO
 from tuning.optimizer import Optimizer
 from validator.model_validation import ModelValidator
-from numpy.typing import ArrayLike
 
 
 class AutoMLRandomForest:
@@ -15,9 +14,11 @@ class AutoMLRandomForest:
         response: ResponseTuningDTO = Optimizer(self._request).optimize()
         model_validator = ModelValidator(request=self._request, response=response)
         scores: dict = model_validator.get_scores()
+        scores.update(response.tuning_metric)
         y_pred: dict = model_validator.get_predict()
+        response_dict = asdict(response)
         # combine dicts
-        return asdict(response) | scores | y_pred
+        return response_dict | {"score": scores} | y_pred
 
 
 

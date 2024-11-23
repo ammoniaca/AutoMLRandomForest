@@ -11,9 +11,12 @@ class RandomizedSearchCVStrategy(IOptimizerStrategy):
         self._request = request
 
     def optimize(self) -> ResponseTuningDTO:
+        """
+        Run the optimization process.
+        """
         randomized_search = RandomizedSearchCV(
             estimator=get_estimator(self._request),
-            param_distributions=self._request.space,
+            param_distributions=self._request.space.to_dict(),
             n_iter=self._request.n_iter,
             scoring=self._request.tuning_scoring.value,
             n_jobs=self._request.n_jobs,
@@ -25,7 +28,8 @@ class RandomizedSearchCVStrategy(IOptimizerStrategy):
         )
         randomized_search.fit(self._request.X_train, self._request.y_train)
         return ResponseTuningDTO(
+            strategy=self._request.optimizer.value,
             best_estimator=randomized_search.best_estimator_,
             best_params=randomized_search.best_params_,
-            best_score=randomized_search.best_score_
+            tuning_metric={f'tuning_{self._request.tuning_scoring.value}': randomized_search.best_score_}
         )

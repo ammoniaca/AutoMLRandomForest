@@ -1,20 +1,19 @@
 from dto.dto import RequestDTO, ResponseTuningDTO
 from tuning.grid_search_cv_concrete_strategy import GridSearchCVStrategy
 from tuning.randomized_search_cv_concrete_strategy import RandomizedSearchCVStrategy
-from enumerator.hyperparameter_optimizers import HyperparameterOptimizer
-
-
+from tuning.optuna_concrete_strategy import OptunaCVStrategy
 
 
 class Optimizer:
     def __init__(self, request: RequestDTO):
-        self._request = request
+        self._request: RequestDTO = request
+        self._strategy: dict = {
+            "gridSearchCV": GridSearchCVStrategy(self._request),
+            "randomizedSearchCV": RandomizedSearchCVStrategy(self._request),
+            "optunaCV": OptunaCVStrategy(self._request),
+        }
 
     def optimize(self) -> ResponseTuningDTO:
-        _strategy: dict = {
-            "gridSearchCV": GridSearchCVStrategy(self._request).optimize(),
-            "randomizedSearchCV": GridSearchCVStrategy(self._request).optimize()
-        }
-        return _strategy.get(self._request.optimizer.value)
+        return self._strategy.get(self._request.optimizer.value).optimize()
 
 

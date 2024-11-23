@@ -12,15 +12,17 @@ class GridSearchCVStrategy(IOptimizerStrategy):
 
     def optimize(self) -> ResponseTuningDTO:
         """
-         hyperparameter tuning by exhaustively searching through a predefined grid of
-         parameter combinations, evaluating each combination using cross-validation,
-         and providing us with the best set of parameters that maximize the model’s performance
+        Run the optimization process.
+
+        hyperparameter tuning by exhaustively searching through a predefined grid of parameter combinations,
+        evaluating each combination using cross-validation, and providing us with the best set of parameters
+        that maximize the model’s performance.
 
         :return: ResponseTuningDTO
         """
         grid_search = GridSearchCV(
             estimator=get_estimator(self._request),
-            param_grid=self._request.space,
+            param_grid=self._request.space.to_dict(),
             cv=self._request.cv,
             scoring=self._request.tuning_scoring.value,
             verbose=self._request.verbose,
@@ -28,7 +30,8 @@ class GridSearchCVStrategy(IOptimizerStrategy):
         )
         grid_search.fit(self._request.X_train, self._request.y_train)
         return ResponseTuningDTO(
+            strategy=self._request.optimizer.value,
             best_estimator=grid_search.best_estimator_,
             best_params=grid_search.best_params_,
-            best_score=grid_search.best_score_
+            tuning_metric={f'tuning_{self._request.tuning_scoring.value}': grid_search.best_score_}
         )
