@@ -120,7 +120,12 @@ if __name__ == '__main__':
             scores = result_grid_search.get("score")
             df3 = pd.DataFrame(scores, index=[0])
             df3.to_csv(f"{gridsearch_save_label}_metric_score_{dt_string}.csv", index=False)
+
+            # save the best trained model
+            with open(f'{gridsearch_save_label}_model_{dt_string}.pkl', 'wb') as f:
+                pickle.dump(result_grid_search.get('best_estimator'), f)
             print("")
+
 
     # AutoML - RF regression : example for RandomizedSearchCV
     if test_randomized_search_cv:
@@ -164,6 +169,10 @@ if __name__ == '__main__':
             scores = result_randomized_search.get("score")
             df3 = pd.DataFrame(scores, index=[0])
             df3.to_csv(f"{randomizedsearch_save_label}_metric_score_{dt_string}.csv", index=False)
+
+            # save the best trained model
+            with open(f'{randomizedsearch_save_label}_model_{dt_string}.pkl', 'wb') as f:
+                pickle.dump(result_randomized_search.get('best_estimator'), f)
             print("")
 
     if test_optuna:
@@ -220,4 +229,8 @@ if __name__ == '__main__':
             scores = result_optuna.get("score")
             df3 = pd.DataFrame(scores, index=[0])
             df3.to_csv(f"{optuna_save_label}_metric_score_{dt_string}.csv", index=False)
+
+            # save trained model
+            with open(f'{optuna_save_label}_model_{dt_string}.pkl', 'wb') as f:
+                pickle.dump(result_optuna.get('best_estimator'), f)
             print("")
